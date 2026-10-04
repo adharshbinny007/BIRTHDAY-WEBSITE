@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Birthday Magic ✨</title>
+<style>
+:root{--night:#09091f;--purple:#211044;--pink:#ff9dcc;--gold:#ffe6a7;--glass:rgba(255,255,255,.09)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#fff;font-family:Georgia,"Times New Roman",serif;background:radial-gradient(circle at 50% 0%,#392060 0,#17102f 38%,var(--night) 78%);overflow-x:hidden}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.wrap{width:min(940px,92%);margin:auto;padding:28px 0 60px}
+.panel{background:var(--glass);border:1px solid #ffffff26;backdrop-filter:blur(12px);border-radius:24px;padding:clamp(20px,4vw,36px);box-shadow:0 20px 70px #0005;margin:18px 0}
+.center{text-align:center}
+h1,h2{margin:.25em 0;color:#ffd7ec;text-shadow:0 0 20px #ff8bc677}
+h1{font-size:clamp(2rem,6vw,4.3rem)}h2{font-size:clamp(1.5rem,4vw,2.4rem)}
+p{line-height:1.7}
+button,.file-label{font:inherit;font-weight:bold;cursor:pointer;border:0;border-radius:999px;padding:12px 20px;color:#251037;background:linear-gradient(135deg,#ffe9ad,#ff9fce);box-shadow:0 5px 24px #ff91ca35;transition:transform .2s}
+button:hover,.file-label:hover{transform:translateY(-2px) scale(1.02)}
+input[type=password]{padding:12px 15px;border-radius:12px;border:1px solid #ffffff50;background:#100c27;color:white;font-size:1.1rem;width:180px;text-align:center}
+.hidden{display:none!important}
+.small{opacity:.8;font-size:.95rem}
+.hero-emoji{font-size:clamp(3.5rem,12vw,7rem);margin:8px}
+.flame{display:inline-block;animation:flicker .65s infinite alternate;transform-origin:bottom}
+@keyframes flicker{from{transform:rotate(-5deg) scale(.95);filter:drop-shadow(0 0 7px orange)}to{transform:rotate(5deg) scale(1.1);filter:drop-shadow(0 0 17px #ffb22e)}}
+#birthdayTitle{animation:grand 1s both;text-transform:uppercase;letter-spacing:.04em}
+@keyframes grand{0%{opacity:0;transform:scale(.25) rotate(-8deg);filter:blur(8px)}70%{transform:scale(1.12) rotate(2deg)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.preview{min-height:130px;border:1px dashed #ffffff65;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:12px;background:#08071b55;text-align:center;overflow:hidden}
+.preview img,.preview video{width:100%;max-height:330px;object-fit:contain;border-radius:12px}
+input[type=file]{max-width:100%;font-size:.85rem}
+#letterText{white-space:pre-wrap;text-align:left;background:#fff9f1;color:#4a2446;padding:24px;border-radius:16px;line-height:1.8;font-size:1.05rem}
+audio{width:100%;margin:12px 0}
+.songrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.songrow input{max-width:100%}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.conf{position:absolute;top:-30px;animation:fall linear forwards;font-size:20px}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}
+footer{text-align:center;opacity:.65;font-size:.9rem;margin-top:30px}
+@media(max-width:500px){.panel{padding:18px}.songrow{flex-direction:column}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas><div id="confetti"></div>
+<div class="wrap">
+  <section class="panel center" id="lock">
+    <div class="hero-emoji">🌙✨</div>
+    <p class="small">A LITTLE BIRTHDAY MAGIC</p>
+    <h1>Just for you 💖</h1>
+    <p>Enter the secret password to unlock your surprise.</p>
+    <form id="passwordForm"><input id="password" type="password" inputmode="numeric" maxlength="12" placeholder="Password" aria-label="Password" required> <button type="submit">Unlock 💝</button></form>
+    <p id="passwordMessage" class="small" aria-live="polite"></p>
+  </section>
+
+  <main id="surprise" class="hidden">
+    <section class="panel center">
+      <p class="small">A LITTLE SURPRISE MADE WITH LOVE</p>
+      <h1>For You, Madam ✨</h1>
+      <p>May your day sparkle with happiness, love, and beautiful memories. 💗</p>
+    </section>
+
+    <section class="panel center" id="cakeSection">
+      <h2>Make a wish! 🎂</h2>
+      <div class="hero-emoji">🐱 🎂 <span class="flame" id="flame">🕯️</span></div>
+      <p id="candleText">Close your eyes, make a wish, and blow the candle!</p>
+      <button id="blowButton">BLOW THE CANDLES 🕯️</button>
+      <h1 id="birthdayTitle" class="hidden">HAPPY BIRTHDAY TO YOU, MADAM! 💖</h1>
+      <p id="afterCandle" class="hidden">🎉 🌸 May all your sweetest wishes come true! 🌸 🎉</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="center">🎵 Your Birthday Playlist</h2>
+      <p class="center">Choose your first song below. When it finishes, the next uploaded song plays automatically.</p>
+      <div class="songrow"><label class="file-label" for="songs">＋ Add songs</label><input id="songs" type="file" accept="audio/*" multiple></div>
+      <p class="small center">The first song you add is the first song in the playlist. Keep this page open while listening.</p>
+      <h3 id="nowPlaying" class="center">No songs added yet</h3>
+      <audio id="player" controls preload="metadata"></audio>
+      <div class="songrow"><button id="prevSong">⏮ Previous</button><button id="playPause">▶ Play</button><button id="nextSong">Next ⏭</button></div>
+      <ol id="playlist"></ol>
+      <p class="small center">Note: Browsers may block automatic audio until you interact with the page. After you add songs, press Play once if needed.</p>
+    </section>
+
+    <section class="panel">
+      <h2 class="center">📸 Our Memories</h2>
+      <p class="center">Add the photos you want to show in the gallery.</p>
+      <div class="songrow"><label class="file-label" for="photos">＋ Add photos</label><input id="photos" type="file" accept="image/*" multiple></div>
+      <div id="photoGallery" class="grid" style="margin-top:16px"></div>
+    </section>
+
+    <section class="panel">
+      <h2 class="center">🎬 A Special Video</h2>
+      <p class="center">Choose your edited video to show it here.</p>
+      <div class="center"><input id="videoFile" type="file" accept="video/*"></div>
+      <div id="videoPreview" class="preview" style="margin-top:16px">🎞️ Your video preview will appear here.</div>
+    </section>
+
+    <section class="panel">
+      <h2 class="center">💌 A Little Letter for You</h2>
+      <p class="center">You can replace this sample with your own personal letter in the code.</p>
+      <div id="letterText">Dear Madam, 💖
+
+Wishing you a birthday filled with happiness, laughter, and lovely surprises. May every new day bring you reasons to smile, and may your dreams bloom beautifully.
+
+You are special, and today is all about celebrating you. Keep smiling and keep shining! ✨
+
+With lots of love,
+Your Secret Birthday Surprise 🌷</div>
+    </section>
+    <section class="panel center"><h2>🌟 One Last Wish</h2><p>HAPPY BIRTHDAY TO YOU, MADAM! 💗</p><p>🌙 ✨ 🌸 🎉 💖 🎉 🌸 ✨ 🌙</p></section>
+  </main>
+  <footer>Made with love, moonlight, and a little magic ✨</footer>
+</div>
+<script>
+const PASSCODE = "1901";
+const $ = id => document.getElementById(id);
+$("passwordForm").addEventListener("submit", e => {
+  e.preventDefault();
+  if ($("password").value === PASSCODE) {
+    $("lock").classList.add("hidden");
+    $("surprise").classList.remove("hidden");
+    launchConfetti(45);
+    // Browsers can block autoplay. If songs have already been selected, try to play.
+    if (tracks.length) startTrack(0, true);
+  } else {
+    $("passwordMessage").textContent = "Wrong password. Try again 💫";
+    $("password").value = "";
+  }
+});
+
+$("blowButton").addEventListener("click", () => {
+  $("flame").classList.add("hidden");
+  $("candleText").textContent = "Wish made! The candle is out! 💨";
+  $("blowButton").classList.add("hidden");
+  $("birthdayTitle").classList.remove("hidden");
+  $("afterCandle").classList.remove("hidden");
+  launchConfetti(100);
+});
+
+let tracks = [], trackIndex = 0;
+const player = $("player");
+$("songs").addEventListener("change", e => {
+  const files = Array.from(e.target.files || []);
+  files.forEach(file => tracks.push({name:file.name, url:URL.createObjectURL(file)}));
+  renderPlaylist();
+  if (tracks.length && trackIndex === 0 && !player.src) startTrack(0, true);
+});
+function startTrack(index, autoplay) {
+  if (!tracks.length) return;
+  trackIndex = (index + tracks.length) % tracks.length;
+  player.src = tracks[trackIndex].url;
+  $("nowPlaying").textContent = "Now playing: " + tracks[trackIndex].name;
+  renderPlaylist();
+  if (autoplay) player.play().then(() => $("playPause").textContent = "⏸ Pause").catch(() => $("playPause").textContent = "▶ Play");
+}
+function renderPlaylist() {
+  $("playlist").innerHTML = "";
+  tracks.forEach((track, i) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.textContent = (i === trackIndex ? "▶ " : "") + track.name;
+    b.style.margin = "4px";
+    b.addEventListener("click", () => startTrack(i, true));
+    li.appendChild(b); $("playlist").appendChild(li);
+  });
+}
+player.addEventListener("ended", () => { if (tracks.length > 1) startTrack(trackIndex + 1, true); });
+player.addEventListener("play", () => $("playPause").textContent = "⏸ Pause");
+player.addEventListener("pause", () => $("playPause").textContent = "▶ Play");
+$("playPause").addEventListener("click", () => {
+  if (!tracks.length) { $("songs").click(); return; }
+  if (player.paused) player.play().catch(()=>{}); else player.pause();
+});
+$("nextSong").addEventListener("click", () => startTrack(trackIndex + 1, true));
+$("prevSong").addEventListener("click", () => startTrack(trackIndex - 1, true));
+
+$("photos").addEventListener("change", e => {
+  Array.from(e.target.files || []).forEach(file => {
+    const url = URL.createObjectURL(file), card = document.createElement("div");
+    card.className = "preview";
+    const img = document.createElement("img"); img.src = url; img.alt = file.name;
+    const cap = document.createElement("span"); cap.textContent = file.name;
+    card.append(img, cap); $("photoGallery").appendChild(card);
+  });
+});
+$("videoFile").addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0]; if (!file) return;
+  const video = document.createElement("video"); video.src = URL.createObjectURL(file); video.controls = true; video.playsInline = true;
+  $("videoPreview").innerHTML = ""; $("videoPreview").appendChild(video);
+});
+function launchConfetti(count) {
+  const box = $("confetti"), symbols = ["💖","🌸","✨","⭐","🎉","💕","🌷"];
+  for (let i=0;i<count;i++) {
+    const el = document.createElement("span"); el.className = "conf";
+    el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    el.style.left = Math.random()*100 + "vw";
+    el.style.animationDuration = (3 + Math.random()*4) + "s";
+    el.style.animationDelay = Math.random()*1.5 + "s";
+    box.appendChild(el); setTimeout(()=>el.remove(),8500);
+  }
+}
+// Twinkling stars background
+const canvas = $("stars"), ctx = canvas.getContext("2d"); let stars = [];
+function resize(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);stars=Array.from({length:Math.floor(innerWidth/5)},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.6+.2,a:Math.random(),s:Math.random()*.018+.003}));}
+function draw(){ctx.clearRect(0,0,innerWidth,innerHeight);stars.forEach(s=>{s.a+=s.s;if(s.a>1||s.a<.1)s.s*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,240,255,${Math.max(.1,Math.min(1,s.a))})`;ctx.fill();});requestAnimationFrame(draw);}
+addEventListener("resize",resize);resize();draw();
+</script>
+</body>
+</html>
