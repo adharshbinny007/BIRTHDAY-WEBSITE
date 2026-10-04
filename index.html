@@ -1,480 +1,89 @@
-<!doctype html>
-<html lang="en">
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="ta">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#080d1b">
-  <title>A Little Birthday Wish</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --night: #080d1b;
-      --night-soft: #10182a;
-      --ink: #f7f2e9;
-      --muted: #a7afc3;
-      --gold: #f5d9a6;
-      --rose: #f2a9bd;
-      --line: rgba(255, 255, 255, .15);
-      --serif: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
-      --sans: "Trebuchet MS", "Segoe UI", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      min-width: 320px;
-      min-height: 100svh;
-      margin: 0;
-      overflow-x: hidden;
-      background: var(--night);
-      color: var(--ink);
-      font-family: var(--sans);
-    }
-
-    button, input { font: inherit; }
-    button { color: inherit; }
-
-    .sky {
-      position: fixed;
-      z-index: -1;
-      inset: 0;
-      overflow: hidden;
-      background:
-        radial-gradient(ellipse at 50% 105%, rgba(37, 57, 87, .62), transparent 52%),
-        radial-gradient(ellipse at 78% 22%, rgba(50, 47, 83, .3), transparent 37%),
-        linear-gradient(160deg, #080d1b 5%, #11182a 58%, #101a2a);
-    }
-
-    .sky::before, .sky::after {
-      position: absolute;
-      inset: -30%;
-      content: "";
-      pointer-events: none;
-    }
-
-    .sky::before {
-      opacity: .28;
-      background-image: radial-gradient(ellipse at 52% 55%, rgba(112, 139, 171, .12), transparent 38%);
-      animation: sky-drift 24s ease-in-out infinite alternate;
-    }
-
-    .sky::after {
-      opacity: .2;
-      background-image: radial-gradient(ellipse at 50% 100%, rgba(246, 197, 157, .19), transparent 34%);
-      animation: sky-drift 32s ease-in-out infinite alternate-reverse;
-    }
-
-    .stars, .stars::before, .stars::after {
-      position: absolute;
-      inset: 0;
-      background-repeat: repeat;
-      content: "";
-      pointer-events: none;
-    }
-
-    .stars {
-      opacity: .82;
-      background-image:
-        radial-gradient(1px 1px at 13% 18%, #fff 50%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 61% 24%, #f8e9d0 50%, transparent 100%),
-        radial-gradient(1px 1px at 86% 61%, #fff 50%, transparent 100%),
-        radial-gradient(1px 1px at 33% 78%, #c7d9ff 50%, transparent 100%),
-        radial-gradient(1.5px 1.5px at 73% 89%, #fff 50%, transparent 100%);
-      background-size: 229px 197px, 283px 251px, 317px 223px, 269px 293px, 347px 277px;
-      animation: twinkle 5s ease-in-out infinite alternate;
-    }
-
-    .stars::before {
-      opacity: .55;
-      background-image:
-        radial-gradient(1px 1px at 20% 70%, #fff 50%, transparent 100%),
-        radial-gradient(1px 1px at 49% 33%, #f5d9a6 50%, transparent 100%),
-        radial-gradient(1px 1px at 92% 16%, #fff 50%, transparent 100%);
-      background-size: 181px 213px, 307px 241px, 263px 319px;
-      animation: twinkle 3.7s ease-in-out infinite alternate-reverse;
-    }
-
-    .stars::after {
-      opacity: .4;
-      background-image:
-        radial-gradient(1px 1px at 38% 41%, #fff 50%, transparent 100%),
-        radial-gradient(1px 1px at 78% 73%, #c7d9ff 50%, transparent 100%);
-      background-size: 241px 287px, 331px 211px;
-      animation: twinkle 6s ease-in-out infinite alternate;
-    }
-
-    .shooting-star {
-      position: absolute;
-      top: 15%;
-      left: 69%;
-      width: 110px;
-      height: 1px;
-      opacity: 0;
-      transform: rotate(-35deg);
-      transform-origin: left;
-      background: linear-gradient(90deg, rgba(255,255,255,.8), transparent);
-      animation: shooting-star 9s 2s ease-in infinite;
-    }
-
-    .topbar {
-      position: absolute;
-      z-index: 2;
-      top: 0;
-      left: 0;
-      display: flex;
-      width: 100%;
-      align-items: center;
-      justify-content: space-between;
-      padding: 28px clamp(22px, 5vw, 72px);
-    }
-
-    .wordmark {
-      color: rgba(247, 242, 233, .74);
-      font-family: var(--serif);
-      font-size: 15px;
-      letter-spacing: .08em;
-    }
-
-    .moon-trigger {
-      display: grid;
-      width: 48px;
-      height: 48px;
-      place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      background: rgba(255,255,255,.045);
-      cursor: pointer;
-      font-size: 23px;
-      transition: transform .25s ease, background .25s ease, border-color .25s ease;
-    }
-
-    .moon-trigger:hover, .moon-trigger:focus-visible {
-      transform: rotate(-12deg) scale(1.08);
-      border-color: rgba(245, 217, 166, .65);
-      background: rgba(245, 217, 166, .1);
-    }
-
-    main {
-      display: grid;
-      min-height: 100svh;
-      place-items: center;
-      padding: 100px 22px 54px;
-    }
-
-    .screen {
-      width: min(100%, 490px);
-      text-align: center;
-      animation: arrive .9s cubic-bezier(.2,.75,.25,1) both;
-    }
-
-    .screen[hidden] { display: none; }
-
-    .eyebrow {
-      margin: 0 0 18px;
-      color: var(--gold);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .28em;
-      text-transform: uppercase;
-    }
-
-    h1, h2, p { margin-top: 0; }
-
-    h1, h2 {
-      margin-bottom: 13px;
-      font-family: var(--serif);
-      font-weight: 400;
-      letter-spacing: .01em;
-    }
-
-    h1 { font-size: clamp(36px, 8vw, 58px); }
-    h2 { font-size: clamp(40px, 9vw, 66px); line-height: 1.02; }
-
-    .subheading {
-      margin-bottom: 30px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .lock-orbit {
-      position: relative;
-      display: grid;
-      width: 174px;
-      height: 174px;
-      margin: 0 auto 24px;
-      place-items: center;
-      border: 1px solid rgba(245, 217, 166, .2);
-      border-radius: 50%;
-      box-shadow: 0 0 54px rgba(233, 197, 150, .07), inset 0 0 35px rgba(233, 197, 150, .035);
-    }
-
-    .lock-orbit::before, .lock-orbit::after {
-      position: absolute;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 50%;
-      content: "";
-    }
-
-    .lock-orbit::before { inset: 12px; }
-    .lock-orbit::after { inset: -8px; border-style: dashed; opacity: .45; animation: orbit 36s linear infinite; }
-
-    .lock-icon {
-      color: var(--gold);
-      font-size: 39px;
-      filter: drop-shadow(0 0 15px rgba(245, 217, 166, .45));
-    }
-
-    .pin-form { width: min(100%, 310px); margin: 0 auto; }
-
-    .pin-label {
-      display: block;
-      margin-bottom: 12px;
-      color: #d7d9e0;
-      font-size: 12px;
-      letter-spacing: .08em;
-    }
-
-    .pin-input {
-      width: 100%;
-      height: 54px;
-      border: 1px solid rgba(255,255,255,.19);
-      border-radius: 3px;
-      outline: none;
-      background: rgba(255,255,255,.045);
-      color: var(--ink);
-      font-size: 21px;
-      letter-spacing: .6em;
-      text-align: center;
-      transition: border-color .2s, box-shadow .2s;
-    }
-
-    .pin-input::placeholder { color: rgba(255,255,255,.28); }
-    .pin-input:focus { border-color: rgba(245,217,166,.75); box-shadow: 0 0 0 3px rgba(245,217,166,.1); }
-
-    .unlock-button {
-      width: 100%;
-      min-height: 50px;
-      margin-top: 12px;
-      border: 1px solid rgba(245,217,166,.8);
-      border-radius: 3px;
-      background: var(--gold);
-      color: #201b19;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .19em;
-      text-transform: uppercase;
-      transition: background .2s, transform .2s;
-    }
-
-    .unlock-button:hover { transform: translateY(-2px); background: #ffe8c1; }
-    .status { min-height: 22px; margin: 12px 0 0; color: var(--rose); font-size: 12px; }
-
-    .birthday-screen { width: min(100%, 650px); }
-
-    .birthday-screen .subheading {
-      max-width: 450px;
-      margin: 19px auto 0;
-      font-size: 15px;
-    }
-
-    .wish-note {
-      max-width: 450px;
-      margin: 26px auto 0;
-      color: #e8dcd0;
-      font-family: var(--serif);
-      font-size: 19px;
-      line-height: 1.7;
-    }
-
-    .wish-note span { color: var(--rose); }
-
-    .birthday-moon {
-      display: grid;
-      width: 164px;
-      height: 164px;
-      margin: 0 auto 28px;
-      place-items: center;
-      border: 1px solid rgba(245,217,166,.35);
-      border-radius: 50%;
-      background: radial-gradient(circle at 38% 35%, rgba(255,244,219,.19), rgba(245,217,166,.045) 65%, transparent 66%);
-      box-shadow: 0 0 65px rgba(245,217,166,.12);
-      font-size: 75px;
-      animation: moon-float 5s ease-in-out infinite;
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      z-index: 5;
-      inset: 0;
-      display: grid;
-      padding: 22px;
-      place-items: center;
-      background: rgba(3,6,14,.7);
-      backdrop-filter: blur(8px);
-      animation: fade-in .2s ease both;
-    }
-
-    .modal-backdrop[hidden] { display: none; }
-
-    .modal {
-      position: relative;
-      width: min(100%, 390px);
-      padding: 49px 30px 43px;
-      border: 1px solid rgba(245,217,166,.32);
-      background: linear-gradient(145deg, rgba(27,34,52,.98), rgba(13,19,33,.98));
-      text-align: center;
-      box-shadow: 0 24px 90px rgba(0,0,0,.42);
-      animation: modal-in .3s cubic-bezier(.2,.8,.2,1) both;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      width: 36px;
-      height: 36px;
-      border: 0;
-      background: transparent;
-      color: #d9d9e1;
-      cursor: pointer;
-      font-size: 23px;
-    }
-
-    .modal-moon { display: block; margin-bottom: 15px; font-size: 43px; }
-    .modal h2 { margin: 0; color: var(--gold); font-size: 35px; }
-    .modal p { margin: 13px 0 0; color: var(--muted); font-size: 13px; }
-
-    .footer-note {
-      position: absolute;
-      right: 18px;
-      bottom: 16px;
-      left: 18px;
-      color: rgba(210,216,230,.48);
-      font-size: 10px;
-      letter-spacing: .1em;
-      text-align: center;
-    }
-
-    @keyframes twinkle { from { opacity: .48; } to { opacity: .95; } }
-    @keyframes orbit { to { transform: rotate(360deg); } }
-    @keyframes sky-drift { from { transform: translate3d(-2%, 1%, 0); } to { transform: translate3d(2%, -1%, 0); } }
-    @keyframes shooting-star {
-      0%, 62%, 100% { opacity: 0; transform: translate(0,0) rotate(-35deg); }
-      64% { opacity: 1; }
-      70% { opacity: 0; transform: translate(-230px, 145px) rotate(-35deg); }
-    }
-    @keyframes arrive { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes modal-in { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes moon-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-    @media (max-width: 480px) {
-      .topbar { padding-top: 18px; }
-      main { padding-top: 82px; padding-bottom: 66px; }
-      .lock-orbit { width: 148px; height: 148px; margin-bottom: 21px; }
-      .footer-note { font-size: 9px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        scroll-behavior: auto !important;
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOO YOU ✨</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;overflow:hidden;font-family:Arial,sans-serif;color:#fff8df;background:radial-gradient(ellipse at 50% 15%,#34234f 0,#120e2c 48%,#050612 100%);display:flex;align-items:center;justify-content:center}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.card{position:relative;z-index:1;width:min(92vw,390px);max-height:96vh;overflow:auto;text-align:center;padding:18px 22px 22px;border:1px solid #e7c87588;border-radius:26px;background:#100d27bb;box-shadow:0 0 35px #d7a83c25;backdrop-filter:blur(5px)}
+.moon{font-size:50px;color:#ffe8a0;text-shadow:0 0 12px #ffe7a0,0 0 35px #e8b94f;margin:0}
+h1{margin:3px 0 10px;font-size:30px;letter-spacing:5px;color:#ffe6a0;text-shadow:0 0 14px #d8a94b}
+.cake{font-size:66px;line-height:1.15;filter:drop-shadow(0 0 12px #ffc65b);margin:4px 0}
+.birthday{font-size:13px;letter-spacing:2px;color:#f5d88c;margin-bottom:15px}
+.label{font-size:12px;letter-spacing:3px;margin:12px 0;color:#fff1c7}
+.dots{display:flex;justify-content:center;gap:12px;margin:12px 0 16px}
+.dot{width:12px;height:12px;border:1px solid #f4d98d;border-radius:50%}
+.dot.filled{background:#ffe5a0;box-shadow:0 0 10px #ffe5a0}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:270px;margin:0 auto}
+button{font:inherit;cursor:pointer;color:#fff4cf;border:1px solid #d9b85e88;border-radius:13px;background:linear-gradient(145deg,#35284e,#17142d);padding:12px 8px;font-size:20px;box-shadow:0 3px 12px #0005}
+button:active{transform:scale(.96);background:#57432c}
+#message{min-height:22px;margin:10px 0 4px;font-size:13px;color:#ffe8a0}
+.hint{font-size:12px;color:#cbbfdb;margin-top:8px}
+#welcome{display:none}
+#popLayer{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.pop{position:absolute;transform:translate(-50%,-50%);font-size:26px;animation:pop 1.5s ease-out forwards;filter:drop-shadow(0 0 7px #ffe7a0)}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}20%{opacity:1;transform:translate(-50%,-65%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-130%) scale(.75)}}
+.small{font-size:13px;color:#e9d9ac}
+</style>
 </head>
 <body>
-  <div class="sky" aria-hidden="true"><div class="stars"></div><div class="shooting-star"></div></div>
-
-  <header class="topbar">
-    <div class="wordmark">a little something for you</div>
-    <button class="moon-trigger" id="moonButton" type="button" aria-label="Open the moon message" aria-haspopup="dialog" aria-controls="moonDialog">🌙</button>
-  </header>
-
-  <main>
-    <section class="screen" id="lockScreen" aria-labelledby="lockTitle">
-      <div class="lock-orbit" aria-hidden="true"><span class="lock-icon">✧</span></div>
-      <p class="eyebrow">a birthday surprise</p>
-      <h1 id="lockTitle">Just for you</h1>
-      <p class="subheading">A little piece of the night is waiting.<br>Enter the secret number to open it.</p>
-      <form class="pin-form" id="pinForm">
-        <label class="pin-label" for="pinInput">YOUR FOUR-DIGIT PIN</label>
-        <input class="pin-input" id="pinInput" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="••••" aria-describedby="pinStatus" required>
-        <button class="unlock-button" type="submit">Unlock your wish</button>
-        <p class="status" id="pinStatus" role="status" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <section class="screen birthday-screen" id="birthdayScreen" aria-labelledby="birthdayTitle" hidden>
-      <div class="birthday-moon" aria-hidden="true">🌙</div>
-      <p class="eyebrow">tonight, the stars are yours</p>
-      <h2 id="birthdayTitle">Happy Birthday</h2>
-      <p class="subheading">May this new year bring you soft mornings, brave dreams, and all the little moments that make your heart feel at home.</p>
-      <p class="wish-note">You make the world a little brighter just by being in it. I hope your day is as lovely and wonderful as <span>you are.</span></p>
-    </section>
-  </main>
-
-  <p class="footer-note">MADE WITH LOVE, UNDER A SKY FULL OF STARS</p>
-
-  <div class="modal-backdrop" id="moonDialog" hidden>
-    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="moonMessage">
-      <button class="modal-close" id="closeDialog" type="button" aria-label="Close moon message">&times;</button>
-      <span class="modal-moon" aria-hidden="true">🌙</span>
-      <h2 id="moonMessage">Chloo Thangoo</h2>
-      <p>A little moonlight, just for you.</p>
-    </section>
+<canvas id="stars"></canvas><div id="popLayer"></div>
+<main class="card" id="lock">
+  <div class="moon">☾</div>
+  <h1>TOO YOU</h1>
+  <div class="cake">🎂</div>
+  <div class="birthday">✨ A LITTLE BIRTHDAY MAGIC ✨</div>
+  <div class="label">ENTER THE PASSWORD</div>
+  <div class="dots" id="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+  <div class="keypad">
+    <button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button>
+    <button data-n="4">4</button><button data-n="5">5</button><button data-n="6">6</button>
+    <button data-n="7">7</button><button data-n="8">8</button><button data-n="9">9</button>
+    <button id="clear">⌫</button><button data-n="0">0</button><button id="enter">✓</button>
   </div>
-
-  <script>
-    const pinForm = document.querySelector("#pinForm");
-    const pinInput = document.querySelector("#pinInput");
-    const pinStatus = document.querySelector("#pinStatus");
-    const lockScreen = document.querySelector("#lockScreen");
-    const birthdayScreen = document.querySelector("#birthdayScreen");
-    const moonButton = document.querySelector("#moonButton");
-    const moonDialog = document.querySelector("#moonDialog");
-    const closeDialog = document.querySelector("#closeDialog");
-
-    pinInput.addEventListener("input", () => {
-      pinInput.value = pinInput.value.replace(/\D/g, "").slice(0, 4);
-      pinStatus.textContent = "";
-    });
-
-    pinForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (pinInput.value === "1901") {
-        lockScreen.hidden = true;
-        birthdayScreen.hidden = false;
-        birthdayScreen.focus({ preventScroll: true });
-      } else {
-        pinStatus.textContent = "That isn't quite it. Try once more.";
-        pinInput.value = "";
-        pinInput.focus();
-      }
-    });
-
-    function openMoonMessage() {
-      moonDialog.hidden = false;
-      closeDialog.focus();
-    }
-
-    function dismissMoonMessage() {
-      moonDialog.hidden = true;
-      moonButton.focus();
-    }
-
-    moonButton.addEventListener("click", openMoonMessage);
-    closeDialog.addEventListener("click", dismissMoonMessage);
-    moonDialog.addEventListener("click", (event) => {
-      if (event.target === moonDialog) dismissMoonMessage();
-    });
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !moonDialog.hidden) dismissMoonMessage();
-    });
-  </script>
+  <div id="message" aria-live="polite"></div>
+  <div class="hint">Password Hint: 1901</div>
+</main>
+<main class="card" id="welcome">
+  <div class="moon">☾</div><div class="cake">🎂</div>
+  <h1>WELCOME!</h1>
+  <p>🎉 உங்களுக்கு இனிய பிறந்தநாள் வாழ்த்துகள்! 🎉</p>
+  <p class="small">May your day sparkle with happiness ✨</p>
+</main>
+<script>
+let pin='';
+const dots=[...document.querySelectorAll('.dot')];
+const message=document.getElementById('message');
+function updateDots(){dots.forEach((d,i)=>d.classList.toggle('filled',i<pin.length))}
+function checkPin(){
+ if(pin==='1901'){document.getElementById('lock').style.display='none';document.getElementById('welcome').style.display='block';}
+ else{message.textContent='Wrong Password! Try Again';message.style.color='#ff8a9a';pin='';updateDots();}
+}
+document.querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click',()=>{if(pin.length<4){pin+=b.dataset.n;message.textContent='';message.style.color='#ffe8a0';updateDots();if(pin.length===4)checkPin();}}));
+document.getElementById('clear').addEventListener('click',()=>{pin=pin.slice(0,-1);message.textContent='';updateDots()});
+document.getElementById('enter').addEventListener('click',checkPin);
+document.addEventListener('keydown',e=>{if(e.key>='0'&&e.key<='9'){if(pin.length<4){pin+=e.key;updateDots();if(pin.length===4)checkPin()}}else if(e.key==='Backspace'){pin=pin.slice(0,-1);updateDots()}else if(e.key==='Enter')checkPin()});
+// Tiny moon, flower, and star effects appear at the exact touch/click position.
+const popLayer=document.getElementById('popLayer');
+const emojis=['🌙','🌸','⭐','✨','💫'];
+document.addEventListener('pointerdown',e=>{
+ const el=document.createElement('span');el.className='pop';el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+ el.style.left=e.clientX+'px';el.style.top=e.clientY+'px';popLayer.appendChild(el);
+ setTimeout(()=>el.remove(),1500);
+});
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;stars=Array.from({length:110},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.6+.3,a:Math.random(),s:Math.random()*.012+.003,dx:(Math.random()-.5)*.12}))}
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.a+=s.s;if(s.a>1||s.a<0)s.s*=-1;s.x+=s.dx;if(s.x<0)s.x=canvas.width;if(s.x>canvas.width)s.x=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,232,170,${Math.max(.15,Math.abs(Math.sin(s.a*Math.PI)))})`;ctx.fill()});requestAnimationFrame(animate)}
+addEventListener('resize',resize);resize();animate();
+</script>
 </body>
 </html>
+"""
+path = Path("/mnt/data/index.html")
+path.write_text(html, encoding="utf-8")
+print(f"Created: {path}")
